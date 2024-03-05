@@ -23,5 +23,11 @@ export const initialData: SeedData = {
       password: 'Abc123456',
       roles: ['user'],
     },
+    {
+      email: 'front@financial.com',
+      fullName: 'Front Page',
+      password: 'Abc123456',
+      roles: ['user'],
+    },
   ],
 };
