@@ -1,0 +1,63 @@
+name: Run Unit Tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies Auth
+      run: |
+        cd auth
+        npm ci
+
+    - name: Run auth service tests
+      run: |
+        cd auth 
+        npm run test
+    
+    - name: Install dependencies client
+      run: |
+        cd client
+        npm ci
+
+    - name: Run client service tests
+      run: |
+        cd client
+        npm run test
+
+    - name: Install dependencies product
+      run: |
+        cd product
+        npm ci
+
+    - name: Run product service tests
+      run: |
+        cd product  
+        npm run test
+
+    - name: Install dependencies recommendations
+      run: |
+        cd recommendations
+        npm ci
+
+    - name: Run recommendations service tests
+      run: |
+        cd recommendations
+        npm run test
