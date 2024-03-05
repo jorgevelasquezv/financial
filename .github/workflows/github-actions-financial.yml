@@ -61,3 +61,47 @@ jobs:
       run: |
         cd recommendations
         npm run test
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+    - name: Build and push Docker image auth
+      uses: docker/build-push-action@v2
+      with:
+        context: ./auth
+        file: ./auth/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/auth-service:latest
+    
+    - name: Build and push Docker image client
+      uses: docker/build-push-action@v2
+      with:
+        context: ./client
+        file: ./client/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/client-service:latest
+
+    - name: Build and push Docker image product
+      uses: docker/build-push-action@v2
+      with:
+        context: ./product
+        file: ./product/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/product-service:latest
+
+    - name: Build and push Docker image recommendations
+      uses: docker/build-push-action@v2
+      with:
+        context: ./recommendations
+        file: ./recommendations/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/recommendations-service:latest
