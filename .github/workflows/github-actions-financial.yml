@@ -116,8 +116,9 @@ jobs:
     - name: Deploy auth service to Railway
       run: |
         cd auth
-        RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway up
+        railway up
       env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         API_PREFIX: ${{ secrets.API_PREFIX_AUTH }}
         DB_HOST: ${{ secrets.DB_HOST_AUTH }}
         DB_PORT: ${{ secrets.DB_PORT_AUTH }}
@@ -144,8 +145,9 @@ jobs:
     - name: Deploy client service to Railway
       run: |
         cd client
-        RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway up 
+        railway up 
       env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
         API_PREFIX: ${{secrets.API_PREFIX_CLIENT}}
         DB_NAME: ${{secrets.DB_NAME_CLIENT}}
@@ -162,8 +164,9 @@ jobs:
     - name: Deploy product service to Railway
       run: |
         cd product  
-        RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway up
+        railway up
       env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
         API_PREFIX: ${{secrets.API_PREFIX_PRODUCT}}
         DB_NAME: ${{secrets.DB_NAME_PRODUCT}}
@@ -189,8 +192,9 @@ jobs:
     - name: Deploy recommendations service to Railway
       run: |
         cd recommendations
-        RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway up
+        railway up
       env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
         API_PREFIX: ${{secrets.API_PREFIX_RECOMMENDATION}}
         PRODUCT_PORT: ${{secrets.PRODUCT_PORT_RECOMMENDATION}}
