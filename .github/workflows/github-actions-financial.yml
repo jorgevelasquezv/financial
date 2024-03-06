@@ -113,7 +113,7 @@ jobs:
     - name: Install Railway
       run: npm i -g @railway/cli
     - name: Login to Railway
-      run: echo ${{ secrets.RAILWAY_TOKEN }} | railway login
+      run: echo RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} | railway login
     - name: Deploy auth service to Railway
       run: railway up -f auth/Dockerfile
       env:
@@ -141,7 +141,7 @@ jobs:
     - name: Install Railway
       run: npm i -g @railway/cli
     - name: Login to Railway
-      run: echo ${{ secrets.RAILWAY_TOKEN }} | railway login
+      run: echo RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} | railway login
     - name: Deploy client service to Railway
       run: railway up -f client/Dockerfile
       env:
@@ -184,7 +184,7 @@ jobs:
     - name: Install Railway
       run: npm i -g @railway/cli
     - name: Login to Railway
-      run: echo ${{ secrets.RAILWAY_TOKEN }} | railway login
+      run: echo RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} | railway login
     - name: Deploy recommendations service to Railway
       run: railway up -f recommendations/Dockerfile
       env:
