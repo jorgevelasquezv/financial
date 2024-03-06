@@ -117,19 +117,22 @@ jobs:
     - name: Deploy auth service to Railway
       run: railway up -f auth/Dockerfile
       env:
-        API_PREFIX_AUTH: ${{ secrets.API_PREFIX_AUTH }}
-        DB_HOST_AUTH: ${{ secrets.DB_HOST_AUTH }}
-        DB_PORT_AUTH: ${{ secrets.DB_PORT_AUTH }}
-        DB_USER_AUTH: ${{ secrets.DB_USER_AUTH }}
-        DB_PASSWORD_AUTH: ${{ secrets.DB_PASSWORD_AUTH }}
-        DB_NAME_AUTH: ${{ secrets.DB_NAME_AUTH }}
+        API_PREFIX: ${{ secrets.API_PREFIX_AUTH }}
+        DB_HOST: ${{ secrets.DB_HOST_AUTH }}
+        DB_PORT: ${{ secrets.DB_PORT_AUTH }}
+        DB_USER: ${{ secrets.DB_USER_AUTH }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD_AUTH }}
+        DB_NAME: ${{ secrets.DB_NAME_AUTH }}
         DB_SYNCHRONIZE: ${{ secrets.DB_SYNCHRONIZE_AUTH }}
-        JWT_SECRET_AUTH: ${{ secrets.JWT_SECRET_AUTH }}
-        JWT_EXPIRATION_TIME_AUTH: ${{ secrets.JWT_EXPIRATION_TIME_AUTH }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET_AUTH }}
+        JWT_EXPIRATION_TIME: ${{ secrets.JWT_EXPIRATION_TIME_AUTH }}
         PORT: ${{ secrets.PORT_AUTH }}
     - name: Get auth service URL
       id: get-url
-      run: echo "::set-output name=AUTH_HOST_API_VALID_TOKEN::$(railway variables get AUTH_HOST_API_VALID_TOKEN)"
+      run: |
+        AUTH_HOST_API_VALID_TOKEN=$(railway open -n):3000/api/v1/auth/valid-token
+        echo $AUTH_HOST_API_VALID_TOKEN
+        echo "::set-output name=AUTH_HOST_API_VALID_TOKEN::$AUTH_HOST_API_VALID_TOKEN"
   deploy-others:
     needs: deploy-auth
     runs-on: ubuntu-latest
@@ -142,7 +145,7 @@ jobs:
     - name: Deploy client service to Railway
       run: railway up -f client/Dockerfile
       env:
-        AUTH_HOST_API_VALID_TOKEN: ${{ needs.deploy-auth.outputs.AUTH_HOST_API_VALID_TOKEN }}
+        AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
         API_PREFIX: ${{secrets.API_PREFIX_CLIENT}}
         DB_NAME: ${{secrets.DB_NAME_CLIENT}}
         DB_USER: ${{secrets.DB_USER_CLIENT}}
@@ -154,11 +157,11 @@ jobs:
         HOST_API: ${{secrets.HOST_API_CLIENT}}
     - name: Get client service URL
       id: get-url-client
-      run: echo "::set-output name=CLIENT_HOST_API::$(railway variables get CLIENT_HOST_API)"
+      run: echo "::set-output name=CLIENT_HOST_API::$(railway open -n)"
     - name: Deploy product service to Railway
       run: railway up -f product/Dockerfile
       env:
-        AUTH_HOST_API_VALID_TOKEN: ${{ needs.deploy-auth.outputs.AUTH_HOST_API_VALID_TOKEN }}
+        AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
         API_PREFIX: ${{secrets.API_PREFIX_PRODUCT}}
         DB_NAME: ${{secrets.DB_NAME_PRODUCT}}
         DB_USER: ${{secrets.DB_USER_PRODUCT}}
@@ -170,11 +173,22 @@ jobs:
         HOST_API: ${{secrets.HOST_API_PRODUCT}}
     - name: Get product service URL
       id: get-url-product
-      run: echo "::set-output name=PRODUCT_HOST_API::$(railway variables get PRODUCT_HOST_API)"
+      run: echo "::set-output name=PRODUCT_HOST_API::$(railway open -n)"
+  deploy-recommendations:
+    needs: 
+      - deploy-auth
+      - deploy-others
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Railway
+      run: npm install -g railway
+    - name: Login to Railway
+      run: echo ${{ secrets.RAILWAY_TOKEN }} | railway login
     - name: Deploy recommendations service to Railway
       run: railway up -f recommendations/Dockerfile
       env:
-        AUTH_HOST_API_VALID_TOKEN: ${{ needs.deploy-auth.outputs.AUTH_HOST_API_VALID_TOKEN }}
+        AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
         API_PREFIX: ${{secrets.API_PREFIX_RECOMMENDATION}}
         PRODUCT_PORT: ${{secrets.PRODUCT_PORT_RECOMMENDATION}}
         PRODUCT_HOST_API: ${{secrets.PRODUCT_HOST_API}}
