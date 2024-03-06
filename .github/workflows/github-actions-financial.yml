@@ -107,6 +107,7 @@ jobs:
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/recommendations-service:latest
 
   deploy-auth:
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
