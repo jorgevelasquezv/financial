@@ -111,7 +111,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install Railway
-      run: npm install -g railway
+      run: npm i -g @railway/cli
     - name: Login to Railway
       run: echo ${{ secrets.RAILWAY_TOKEN }} | railway login
     - name: Deploy auth service to Railway
@@ -139,7 +139,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install Railway
-      run: npm install -g railway
+      run: npm i -g @railway/cli
     - name: Login to Railway
       run: echo ${{ secrets.RAILWAY_TOKEN }} | railway login
     - name: Deploy client service to Railway
@@ -182,7 +182,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install Railway
-      run: npm install -g railway
+      run: npm i -g @railway/cli
     - name: Login to Railway
       run: echo ${{ secrets.RAILWAY_TOKEN }} | railway login
     - name: Deploy recommendations service to Railway
