@@ -1,6 +1,6 @@
 version: "3"
 services:
-  db:
+  db-user:
     image: postgres:14.3
     restart: always
     ports:
@@ -10,5 +10,20 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
     container_name: user_db
-    # volumes:
-    #   - ./postgres:/var/lib/postgresql/data
+  auth-service:
+    depends_on:
+      - db-user
+    image: jorgelvelasquez/auth-service:latest
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      PORT: ${PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_TIME: ${JWT_EXPIRATION_TIME}
+    container_name: auth_service

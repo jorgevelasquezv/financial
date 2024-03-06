@@ -1,6 +1,6 @@
 version: "3"
 services:
-  db:
+  db-client:
     image: postgres:14.3
     restart: always
     ports:
@@ -10,5 +10,23 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_DB: ${DB_NAME}
     container_name: client_db
-    # volumes:
-    #   - ./postgres:/var/lib/postgresql/data
+  client-service:
+    depends_on:
+      - db-client
+    image: jorgelvelasquez/client-service:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+      PORT: ${PORT}
+      HOST_API: ${HOST_API}
+      AUTH_HOST_API_VALID_TOKEN: ${AUTH_HOST_API_VALID_TOKEN}
+    container_name: client_service

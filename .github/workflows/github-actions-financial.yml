@@ -105,3 +105,85 @@ jobs:
         file: ./recommendations/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/recommendations-service:latest
+
+  deploy-auth:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Railway
+      run: npm install -g railway
+    - name: Login to Railway
+      run: echo ${{ secrets.RAILWAY_TOKEN }} | railway login
+    - name: Deploy auth service to Railway
+      run: railway up -f auth/Dockerfile
+      env:
+        API_PREFIX_AUTH: ${{ secrets.API_PREFIX_AUTH }}
+        DB_HOST_AUTH: ${{ secrets.DB_HOST_AUTH }}
+        DB_PORT_AUTH: ${{ secrets.DB_PORT_AUTH }}
+        DB_USER_AUTH: ${{ secrets.DB_USER_AUTH }}
+        DB_PASSWORD_AUTH: ${{ secrets.DB_PASSWORD_AUTH }}
+        DB_NAME_AUTH: ${{ secrets.DB_NAME_AUTH }}
+        DB_SYNCHRONIZE: ${{ secrets.DB_SYNCHRONIZE_AUTH }}
+        JWT_SECRET_AUTH: ${{ secrets.JWT_SECRET_AUTH }}
+        JWT_EXPIRATION_TIME_AUTH: ${{ secrets.JWT_EXPIRATION_TIME_AUTH }}
+        PORT: ${{ secrets.PORT_AUTH }}
+    - name: Get auth service URL
+      id: get-url
+      run: echo "::set-output name=AUTH_HOST_API_VALID_TOKEN::$(railway variables get AUTH_HOST_API_VALID_TOKEN)"
+  deploy-others:
+    needs: deploy-auth
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Railway
+      run: npm install -g railway
+    - name: Login to Railway
+      run: echo ${{ secrets.RAILWAY_TOKEN }} | railway login
+    - name: Deploy client service to Railway
+      run: railway up -f client/Dockerfile
+      env:
+        AUTH_HOST_API_VALID_TOKEN: ${{ needs.deploy-auth.outputs.AUTH_HOST_API_VALID_TOKEN }}
+        API_PREFIX: ${{secrets.API_PREFIX_CLIENT}}
+        DB_NAME: ${{secrets.DB_NAME_CLIENT}}
+        DB_USER: ${{secrets.DB_USER_CLIENT}}
+        DB_PASSWORD: ${{secrets.DB_PASSWORD_CLIENT}}
+        DB_HOST: ${{secrets.DB_HOST_CLIENT}}
+        DB_PORT: ${{secrets.DB_PORT_CLIENT}}
+        DB_SYNCHRONIZE: ${{secrets.DB_SYNCHRONIZE_CLIENT}}
+        PORT: ${{secrets.PORT_CLIENT}}
+        HOST_API: ${{secrets.HOST_API_CLIENT}}
+    - name: Get client service URL
+      id: get-url-client
+      run: echo "::set-output name=CLIENT_HOST_API::$(railway variables get CLIENT_HOST_API)"
+    - name: Deploy product service to Railway
+      run: railway up -f product/Dockerfile
+      env:
+        AUTH_HOST_API_VALID_TOKEN: ${{ needs.deploy-auth.outputs.AUTH_HOST_API_VALID_TOKEN }}
+        API_PREFIX: ${{secrets.API_PREFIX_PRODUCT}}
+        DB_NAME: ${{secrets.DB_NAME_PRODUCT}}
+        DB_USER: ${{secrets.DB_USER_PRODUCT}}
+        DB_PASSWORD: ${{secrets.DB_PASSWORD_PRODUCT}}
+        DB_HOST: ${{secrets.DB_HOST_PRODUCT}}
+        DB_PORT: ${{secrets.DB_PORT_PRODUCT}}
+        DB_SYNCHRONIZE: ${{secrets.DB_SYNCHRONIZE_PRODUCT}}
+        PORT: ${{secrets.PORT_PRODUCT}}
+        HOST_API: ${{secrets.HOST_API_PRODUCT}}
+    - name: Get product service URL
+      id: get-url-product
+      run: echo "::set-output name=PRODUCT_HOST_API::$(railway variables get PRODUCT_HOST_API)"
+    - name: Deploy recommendations service to Railway
+      run: railway up -f recommendations/Dockerfile
+      env:
+        AUTH_HOST_API_VALID_TOKEN: ${{ needs.deploy-auth.outputs.AUTH_HOST_API_VALID_TOKEN }}
+        API_PREFIX: ${{secrets.API_PREFIX_RECOMMENDATION}}
+        PRODUCT_PORT: ${{secrets.PRODUCT_PORT_RECOMMENDATION}}
+        PRODUCT_HOST_API: ${{secrets.PRODUCT_HOST_API}}
+        CLIENT_DB_NAME: ${{secrets.CLIENT_DB_NAME_RECOMMENDATION}}
+        CLIENT_DB_USER: ${{secrets.CLIENT_DB_USER_RECOMMENDATION}}
+        CLIENT_DB_PASSWORD: ${{secrets.CLIENT_DB_PASSWORD_RECOMMENDATION}}
+        CLIENT_DB_HOST: ${{secrets.CLIENT_DB_HOST_RECOMMENDATION}}
+        CLIENT_DB_PORT: ${{secrets.CLIENT_DB_PORT_RECOMMENDATION}}
+        CLIENT_DB_SYNCHRONIZE: ${{secrets.CLIENT_DB_SYNCHRONIZE_RECOMMENDATION}}
+        CLIENT_PORT: ${{secrets.CLIENT_PORT_RECOMMENDATION}}
+        CLIENT_HOST_API: ${{secrets.CLIENT_HOST_API}}
+        PORT: ${{secrets.PORT_RECOMMENDATION}}

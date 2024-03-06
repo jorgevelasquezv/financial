@@ -1,0 +1,119 @@
+version: "3"
+services:
+  db-user:
+    image: postgres:14.3
+    restart: always
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD_AUTH}
+      POSTGRES_USER: ${DB_USER_AUTH}
+      POSTGRES_DB: ${DB_NAME_AUTH}
+    container_name: user_db
+  auth-service:
+    depends_on:
+      - db-user
+    image: jorgelvelasquez/auth-service:latest
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      API_PREFIX: ${API_PREFIX_AUTH}
+      DB_HOST: ${DB_HOST_AUTH}
+      DB_PORT: ${DB_PORT_AUTH}
+      DB_USER: ${DB_USER_AUTH}
+      DB_PASSWORD: ${DB_PASSWORD_AUTH}
+      DB_NAME: ${DB_NAME_AUTH}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE_AUTH}
+      PORT: ${PORT_AUTH}
+      JWT_SECRET: ${JWT_SECRET_AUTH}
+      JWT_EXPIRATION_TIME: ${JWT_EXPIRATION_TIME_AUTH}
+    container_name: auth_service
+  
+  db-client:
+    image: postgres:14.3
+    restart: always
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD_CLIENT}
+      POSTGRES_USER: ${DB_USER_CLIENT}
+      POSTGRES_DB: ${DB_NAME_CLIENT}
+    container_name: client_db
+  client-service:
+    depends_on:
+      - db-client
+    image: jorgelvelasquez/client-service:latest
+    restart: always
+    ports:
+      - 3001:3001
+    environment:
+      API_PREFIX: ${API_PREFIX_CLIENT}
+      DB_NAME: ${DB_NAME_CLIENT}
+      DB_USER: ${DB_USER_CLIENT}
+      DB_PASSWORD: ${DB_PASSWORD_CLIENT}
+      DB_HOST: ${DB_HOST_CLIENT}
+      DB_PORT: ${DB_PORT_CLIENT}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE_CLIENT}
+      PORT: ${PORT_CLIENT}
+      HOST_API: ${HOST_API_CLIENT}
+      AUTH_HOST_API_VALID_TOKEN: ${AUTH_HOST_API_VALID_TOKEN}
+    container_name: client_service
+
+  db-product:
+    image: postgres:14.3
+    restart: always
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD_PRODUCT}
+      POSTGRES_USER: ${DB_USER_PRODUCT}
+      POSTGRES_DB: ${DB_NAME_PRODUCT}
+    container_name: product_db
+  product-service:
+    depends_on:
+      - db-product
+    image: jorgelvelasquez/product-service:latest
+    restart: always
+    ports:
+      - 3002:3002
+    environment:
+      API_PREFIX: ${API_PREFIX_PRODUCT}
+      DB_NAME: ${DB_NAME_PRODUCT}
+      DB_USER: ${DB_USER_PRODUCT}
+      DB_PASSWORD: ${DB_PASSWORD_PRODUCT}
+      DB_HOST: ${DB_HOST_PRODUCT}
+      DB_PORT: ${DB_PORT_PRODUCT}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE_PRODUCT}
+      PORT: ${PORT_PRODUCT}
+      HOST_API: ${HOST_API_PRODUCT}
+      AUTH_HOST_API_VALID_TOKEN: ${AUTH_HOST_API_VALID_TOKEN}
+    container_name: product_service
+
+  recommendation-service:
+    depends_on:
+      - db-client
+    image: jorgelvelasquez/recommendation-service:latest
+    restart: always
+    ports:
+      - 3003:3003
+    environment:
+      API_PREFIX: ${API_PREFIX_RECOMMENDATION}
+      PRODUCT_PORT: ${PRODUCT_PORT_RECOMMENDATION}
+      PRODUCT_HOST_API: ${PRODUCT_HOST_API_RECOMMENDATION}
+      CLIENT_DB_NAME: ${CLIENT_DB_NAME_RECOMMENDATION}
+      CLIENT_DB_USER: ${CLIENT_DB_USER_RECOMMENDATION}
+      CLIENT_DB_PASSWORD: ${CLIENT_DB_PASSWORD_RECOMMENDATION}
+      CLIENT_DB_HOST: ${CLIENT_DB_HOST_RECOMMENDATION}
+      CLIENT_DB_PORT: ${CLIENT_DB_PORT_RECOMMENDATION}
+      CLIENT_DB_SYNCHRONIZE: ${CLIENT_DB_SYNCHRONIZE_RECOMMENDATION}
+      CLIENT_PORT: ${CLIENT_PORT_RECOMMENDATION}
+      CLIENT_HOST_API: ${CLIENT_HOST_API_RECOMMENDATION}
+      PORT: ${PORT_RECOMMENDATION}
+      AUTH_HOST_API_VALID_TOKEN: ${AUTH_HOST_API_VALID_TOKEN}
+    container_name: recommendation_service
+
+networks:
+  financial:
+    name: financial
+    driver: bridge
