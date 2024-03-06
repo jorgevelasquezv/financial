@@ -112,8 +112,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install Railway
       run: npm i -g @railway/cli
-    - name: Login to Railway
-      run: echo RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} | railway login
     - name: Deploy auth service to Railway
       run: railway up -f auth/Dockerfile
       env:
@@ -140,10 +138,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install Railway
       run: npm i -g @railway/cli
-    - name: Login to Railway
-      run: echo RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} | railway login
     - name: Deploy client service to Railway
-      run: railway up -f client/Dockerfile
+      run: RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} railway up -f client/Dockerfile
       env:
         AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
         API_PREFIX: ${{secrets.API_PREFIX_CLIENT}}
@@ -183,8 +179,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install Railway
       run: npm i -g @railway/cli
-    - name: Login to Railway
-      run: echo RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }} | railway login
     - name: Deploy recommendations service to Railway
       run: railway up -f recommendations/Dockerfile
       env:
