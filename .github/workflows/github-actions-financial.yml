@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [20.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -116,7 +116,7 @@ jobs:
     - name: Deploy auth service to Railway
       run: |
         cd auth
-        railway up
+        railway up --service auth
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         API_PREFIX: ${{ secrets.API_PREFIX_AUTH }}
@@ -145,7 +145,7 @@ jobs:
     - name: Deploy client service to Railway
       run: |
         cd client
-        railway up
+        railway up --service client
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
@@ -164,7 +164,7 @@ jobs:
     - name: Deploy product service to Railway
       run: |
         cd product
-        railway up
+        railway up --service product
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
@@ -192,7 +192,7 @@ jobs:
     - name: Deploy recommendations service to Railway
       run: |
         cd recommendations
-        railway up
+        railway up --service recommendations
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
