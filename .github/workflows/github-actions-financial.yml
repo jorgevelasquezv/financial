@@ -114,7 +114,9 @@ jobs:
     - name: Install Railway
       run: npm i -g @railway/cli
     - name: Deploy auth service to Railway
-      run: railway up auth/Dockerfile
+      run: |
+        cd auth
+        railway up
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         API_PREFIX: ${{ secrets.API_PREFIX_AUTH }}
@@ -141,7 +143,9 @@ jobs:
     - name: Install Railway
       run: npm i -g @railway/cli
     - name: Deploy client service to Railway
-      run: railway up client/Dockerfile
+      run: |
+        cd client
+        railway up
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
@@ -158,7 +162,9 @@ jobs:
       id: get-url-client
       run: echo "::set-output name=CLIENT_HOST_API::$(railway open -n)"
     - name: Deploy product service to Railway
-      run: railway up product/Dockerfile
+      run: |
+        cd product
+        railway up
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
@@ -184,7 +190,9 @@ jobs:
     - name: Install Railway
       run: npm i -g @railway/cli
     - name: Deploy recommendations service to Railway
-      run: railway up recommendations/Dockerfile
+      run: |
+        cd recommendations
+        railway up
       env:
         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
