@@ -107,6 +107,7 @@ jobs:
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/recommendations-service:latest
 
   deploy-auth:
+    if: false
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
@@ -136,6 +137,7 @@ jobs:
         echo $AUTH_HOST_API_VALID_TOKEN
         echo "::set-output name=AUTH_HOST_API_VALID_TOKEN::$AUTH_HOST_API_VALID_TOKEN"
   deploy-others:
+    if: false
     needs: deploy-auth
     runs-on: ubuntu-latest
     steps:
@@ -181,6 +183,7 @@ jobs:
       id: get-url-product
       run: echo "::set-output name=PRODUCT_HOST_API::$(railway open -n)"
   deploy-recommendations:
+    if: false
     needs: 
       - deploy-auth
       - deploy-others

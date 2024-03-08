@@ -93,7 +93,7 @@ services:
   recommendation-service:
     depends_on:
       - db-client
-    image: jorgelvelasquez/recommendation-service:latest
+    image: jorgelvelasquez/recommendations-service:latest
     restart: always
     ports:
       - 3003:3003

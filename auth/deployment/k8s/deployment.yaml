@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: auth
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "100m"
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+        image: jorgelvelasquez/auth-service:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: API_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: API_PREFIX_AUTH
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: DB_HOST_AUTH
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_USER_AUTH
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_PASSWORD_AUTH
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_NAME_AUTH
+        - name: DB_SYNCHRONIZE
+          value: "true"
+        - name: PORT
+          value: "3000"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: JWT_SECRET_AUTH
+        - name: JWT_EXPIRATION_TIME
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: JWT_EXPIRATION_TIME_AUTH
+        command: ["/bin/sh", "-c"]
+        args: ["until nc -zv db-user 5432; do sleep 5; done; exec node /usr/src/app/dist/main"]

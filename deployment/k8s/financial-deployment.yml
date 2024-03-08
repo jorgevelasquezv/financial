@@ -1,0 +1,548 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: financial-secret
+type: Opaque
+data:
+    DB_NAME_AUTH: dXNlci1kYg==
+    DB_USER_AUTH: dXNlci1kYg==
+    DB_PASSWORD_AUTH: dXMzci9kNHQ0L2I0czM=
+    DB_NAME_CLIENT: Y2xpZW50LWRi
+    DB_USER_CLIENT: Y2xpZW50LWRi
+    DB_PASSWORD_CLIENT: Y2wxM250L2Q0dDQvYjRzMw==
+    DB_NAME_PRODUCT: cHJvZHVjdC1kYg==
+    DB_USER_PRODUCT: cHJvZHVjdC1kYg==
+    DB_PASSWORD_PRODUCT: cHIwZHVjdC9kNHQ0L2I0czM=
+    CLIENT_DB_NAME_RECOMMENDATION: Y2xpZW50LWRi
+    CLIENT_DB_USER_RECOMMENDATION: Y2xpZW50LWRi
+    CLIENT_DB_PASSWORD_RECOMMENDATION: Y2wxM250L2Q0dDQvYjRzMw==
+    JWT_SECRET_AUTH: VXMzci1zM0NSM3Q=
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: financial-config
+data:
+  # GENERIC ENVIRONMENTS
+  AUTH_HOST_API_VALID_TOKEN: http://auth-service:3000/api/v1/auth/valid-token
+  # AUTH-SERVICE
+  API_PREFIX_AUTH: /api/v1
+  DB_HOST_AUTH: db-user
+  JWT_EXPIRATION_TIME_AUTH: 2h
+  # CLIENT-SERVICE
+  API_PREFIX_CLIENT: api/v1
+  DB_HOST_CLIENT: db-client
+  # PRODUCT-SERVICE
+  API_PREFIX_PRODUCT: api/v1
+  DB_HOST_PRODUCT: db-product
+  # RECOMMENDATION-SERVICE
+  API_PREFIX_RECOMMENDATION: api/v1
+  PRODUCT_HOST_API_RECOMMENDATION: http://product-service:3002/api/v1
+  CLIENT_DB_HOST_RECOMMENDATION: db-client
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: user-db
+spec:
+  serviceName: "user-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-db
+  template:
+    metadata:
+      labels:
+        app: user-db
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: user-db
+        resources:
+          limits:
+            cpu: "0.1"
+            memory: "100Mi"
+        image: postgres:14.3
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_PASSWORD_AUTH
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_USER_AUTH
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_NAME_AUTH
+        ports:
+        - containerPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-user
+spec:
+  selector:
+    app: user-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  clusterIP: None
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: auth
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "100m"
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+        image: jorgelvelasquez/auth-service:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: API_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: API_PREFIX_AUTH
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: DB_HOST_AUTH
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_USER_AUTH
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_PASSWORD_AUTH
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_NAME_AUTH
+        - name: DB_SYNCHRONIZE
+          value: "true"
+        - name: PORT
+          value: "3000"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: JWT_SECRET_AUTH
+        - name: JWT_EXPIRATION_TIME
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: JWT_EXPIRATION_TIME_AUTH
+        command: ["/bin/sh", "-c"]
+        args: ["until nc -zv db-user 5432; do sleep 5; done; exec node /usr/src/app/dist/main"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  selector:
+    app: auth
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: client-db
+spec:
+  serviceName: "client-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-db
+  template:
+    metadata:
+      labels:
+        app: client-db
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: client-db
+        resources:
+          limits:
+            cpu: "0.1"
+            memory: "100Mi"
+        image: postgres:14.3
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_PASSWORD_CLIENT
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_USER_CLIENT
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_NAME_CLIENT
+        ports:
+        - containerPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-client
+spec:
+  selector:
+    app: client-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  clusterIP: None
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: client
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "100m"
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+        image: jorgelvelasquez/client-service:latest
+        ports:
+        - containerPort: 3001
+        env:
+        - name: API_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: API_PREFIX_CLIENT
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: DB_HOST_CLIENT
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_USER_CLIENT
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_PASSWORD_CLIENT
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_NAME_CLIENT
+        - name: DB_SYNCHRONIZE
+          value: "true"
+        - name: PORT
+          value: "3001"
+        - name: AUTH_HOST_API_VALID_TOKEN
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: AUTH_HOST_API_VALID_TOKEN
+        command: ["/bin/sh", "-c"]
+        args: ["until nc -zv db-client 5432; do sleep 5; done; exec node /usr/src/app/dist/main"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-service
+spec:
+  selector:
+    app: client
+  ports:
+    - protocol: TCP
+      port: 3001
+      targetPort: 3001
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: product-db
+spec:
+  serviceName: "product-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-db
+  template:
+    metadata:
+      labels:
+        app: product-db
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: product-db
+        resources:
+          limits:
+            cpu: "0.1"
+            memory: "100Mi"
+        image: postgres:14.3
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_PASSWORD_PRODUCT
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_USER_PRODUCT
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_NAME_PRODUCT
+        ports:
+        - containerPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-product
+spec:
+  selector:
+    app: product-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  clusterIP: None
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product
+  template:
+    metadata:
+      labels:
+        app: product
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: product
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "100m"
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+        image: jorgelvelasquez/product-service:latest
+        ports:
+        - containerPort: 3002
+        env:
+        - name: API_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: API_PREFIX_PRODUCT
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: DB_HOST_PRODUCT
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_USER_PRODUCT
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_PASSWORD_PRODUCT
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_NAME_PRODUCT
+        - name: DB_SYNCHRONIZE
+          value: "true"
+        - name: PORT
+          value: "3002"
+        - name: AUTH_HOST_API_VALID_TOKEN
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: AUTH_HOST_API_VALID_TOKEN
+        command: ["/bin/sh", "-c"]
+        args: ["until nc -zv db-product 5432; do sleep 5; done; exec node /usr/src/app/dist/main"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service
+spec:
+  selector:
+    app: product
+  ports:
+    - protocol: TCP
+      port: 3002
+      targetPort: 3002
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommendation
+  template:
+    metadata:
+      labels:
+        app: recommendation
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: recommendation
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "100m"
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+        image: jorgelvelasquez/recommendations-service:latest
+        ports:
+        - containerPort: 3003
+        env:
+        - name: API_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: API_PREFIX_RECOMMENDATION
+        - name: PRODUCT_PORT
+          value: "3002"
+        - name: PRODUCT_HOST_API
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: PRODUCT_HOST_API_RECOMMENDATION
+        - name: CLIENT_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: CLIENT_DB_NAME_RECOMMENDATION
+        - name: CLIENT_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: CLIENT_DB_USER_RECOMMENDATION
+        - name: CLIENT_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: CLIENT_DB_PASSWORD_RECOMMENDATION
+        - name: CLIENT_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: CLIENT_DB_HOST_RECOMMENDATION
+        - name: CLIENT_DB_PORT
+          value: "5432"
+        - name: CLIENT_DB_SYNCHRONIZE
+          value: "true"
+        - name: CLIENT_PORT
+          value: "3001"
+        - name: PORT
+          value: "3003"
+        - name: AUTH_HOST_API_VALID_TOKEN
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: AUTH_HOST_API_VALID_TOKEN
+        command: ["/bin/sh", "-c"]
+        args: ["until nc -zv db-client 5432; do sleep 5; done; exec node /usr/src/app/dist/main"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommendation-service
+spec:
+  selector:
+    app: recommendation
+  ports:
+    - protocol: TCP
+      port: 3003
+      targetPort: 3003
+  type: LoadBalancer
