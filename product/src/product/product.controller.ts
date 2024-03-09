@@ -24,6 +24,7 @@ import {
 import { ProductCode } from './enums';
 import { ApiConsumes, ApiProduces, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from './guards/auth.guard';
+import { MetricsService } from 'src/metrics/metrics.service';
 
 @ApiInternalErrorResponse()
 @ApiTags('Product')
@@ -31,12 +32,16 @@ import { AuthGuard } from './guards/auth.guard';
 @ApiProduces('application/json')
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly metricService: MetricsService,
+  ) {}
 
   @Post()
   @UseGuards(AuthGuard)
   @ApiCreate()
   create(@Body() createProductDto: CreateProductDto): Promise<Product> {
+    this.metricService.incrementRequestCounter();
     return this.productService.create(createProductDto);
   }
 
@@ -44,6 +49,7 @@ export class ProductController {
   @UseGuards(AuthGuard)
   @ApiFindAll()
   findAll(@Query('isActive') isActive?: string): Promise<Product[]> {
+    this.metricService.incrementRequestCounter();
     return this.productService.findAll(isActive);
   }
 
@@ -54,6 +60,7 @@ export class ProductController {
     @Param('code') code: ProductCode,
     @Query('isActive') isActive?: string,
   ): Promise<Product> {
+    this.metricService.incrementRequestCounter();
     return this.productService.findOne(code, isActive);
   }
 
@@ -64,6 +71,7 @@ export class ProductController {
     @Param('code') code: ProductCode,
     @Body() updateProductDto: UpdateProductDto,
   ): Promise<Product> {
+    this.metricService.incrementRequestCounter();
     return this.productService.update(code, updateProductDto);
   }
 
@@ -71,6 +79,7 @@ export class ProductController {
   @UseGuards(AuthGuard)
   @ApiDelete()
   remove(@Param('code') code: ProductCode): Promise<Product> {
+    this.metricService.incrementRequestCounter();
     return this.productService.remove(code);
   }
 }
