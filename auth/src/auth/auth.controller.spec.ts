@@ -7,6 +7,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PassportModule } from '@nestjs/passport';
+import { MetricsService } from '../metrics/metrics.service';
 
 jest.mock('bcrypt', () => ({
   compareSync: jest.fn(),
@@ -42,6 +43,12 @@ describe('AuthController', () => {
           provide: JwtService,
           useValue: {
             sign: jest.fn().mockImplementation(() => 'token'),
+          },
+        },
+        {
+          provide: MetricsService,
+          useValue: {
+            incrementRequestCounter: jest.fn(),
           },
         },
       ],

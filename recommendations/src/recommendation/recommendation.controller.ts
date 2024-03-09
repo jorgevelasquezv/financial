@@ -23,7 +23,7 @@ import {
   ApiInternalErrorResponse,
 } from './decorators';
 import { AuthGuard } from './guards/auth.guard';
-import { MetricsService } from 'src/metrics/metrics.service';
+import { MetricsService } from '../metrics/metrics.service';
 
 @Controller('recommendation')
 @ApiTags('Recommendation')

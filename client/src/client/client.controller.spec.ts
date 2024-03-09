@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Client } from './entities/client.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { HttpService } from '@nestjs/axios';
+import { MetricsService } from '../metrics/metrics.service';
 
 describe('ClientController', () => {
   let controller: ClientController;
@@ -32,6 +33,12 @@ describe('ClientController', () => {
             get: jest.fn().mockImplementation(() => ({
               pipe: jest.fn(),
             })),
+          },
+        },
+        {
+          provide: MetricsService,
+          useValue: {
+            incrementRequestCounter: jest.fn(),
           },
         },
       ],

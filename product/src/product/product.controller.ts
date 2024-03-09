@@ -24,7 +24,7 @@ import {
 import { ProductCode } from './enums';
 import { ApiConsumes, ApiProduces, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from './guards/auth.guard';
-import { MetricsService } from 'src/metrics/metrics.service';
+import { MetricsService } from '../metrics/metrics.service';
 
 @ApiInternalErrorResponse()
 @ApiTags('Product')
