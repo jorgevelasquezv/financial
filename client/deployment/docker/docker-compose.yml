@@ -13,10 +13,9 @@ services:
   client-service:
     depends_on:
       - db-client
-    image: jorgelvelasquez/client-service:latest
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile
     ports:
       - 3001:3001
     environment:

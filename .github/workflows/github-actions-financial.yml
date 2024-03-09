@@ -78,7 +78,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./auth
-        file: ./auth/Dockerfile
+        file: ./auth/deployment/docker/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/auth-service:latest
     
@@ -86,7 +86,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./client
-        file: ./client/Dockerfile
+        file: ./client/deployment/docker/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/client-service:latest
 
@@ -94,7 +94,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./product
-        file: ./product/Dockerfile
+        file: ./product/deployment/docker/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/product-service:latest
 
@@ -102,9 +102,25 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./recommendations
-        file: ./recommendations/Dockerfile
+        file: ./recommendations/deployment/docker/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/recommendations-service:latest
+    
+    - name: Build and push Docker image prometheus
+      uses: docker/build-push-action@v2
+      with:
+        context: ./deployment
+        file: ./deployment/metrics/Dockerfile.prometheus
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/financial-prometheus:latest
+
+    - name: Build and push Docker image grafana
+      uses: docker/build-push-action@v2
+      with:
+        context: ./deployment
+        file: ./deployment/metrics/Dockerfile.grafana
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/financial-grafana:latest
 
   deploy-auth:
     if: false

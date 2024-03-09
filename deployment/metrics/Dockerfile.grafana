@@ -1,0 +1,2 @@
+FROM grafana/grafana-enterprise:10.0.0
+COPY ./datasource.yml /etc/grafana/provisioning/datasources/datasource.yml

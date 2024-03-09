@@ -3,7 +3,7 @@ FROM node:18-alpine3.15 AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-COPY package*.json ./
+COPY ../../../package*.json ./
 RUN npm install --frozen-lockfile
 
 # Build the app with cache dependencies

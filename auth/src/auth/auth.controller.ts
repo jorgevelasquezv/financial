@@ -15,23 +15,29 @@ import {
 import { User } from './entities/user.entity';
 import { ValidRoles } from './interfaces';
 import { ResponseUserDto } from './dto';
+import { MetricsService } from '../metrics/metrics.service';
 
 @ApiTags('Auth')
 @ApiInternalErrorResponse()
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly metricsServices: MetricsService,
+  ) {}
 
   @Post('/register')
   @Auth(ValidRoles.admin, ValidRoles.superUser)
   @ApiExcludeEndpoint()
   create(@Body() createUserDto: CreateUserDto): Promise<ResponseUserDto> {
+    this.metricsServices.incrementRequestCounter();
     return this.authService.create(createUserDto);
   }
 
   @Post('/login')
   @ApiLoginResponse()
   login(@Body() loginUserDto: LoginUserDto): Promise<ResponseUserDto> {
+    this.metricsServices.incrementRequestCounter();
     return this.authService.login(loginUserDto);
   }
 
@@ -39,6 +45,7 @@ export class AuthController {
   @Auth()
   @ApiRenewTokenResponse()
   renewToken(@GetUser() user: User): Promise<ResponseUserDto> {
+    this.metricsServices.incrementRequestCounter();
     return this.authService.renewToken(user);
   }
 
@@ -46,6 +53,7 @@ export class AuthController {
   @Auth()
   @ApiValidTokenResponse()
   validatedToken() {
+    this.metricsServices.incrementRequestCounter();
     return { message: 'Token is valid' };
   }
 
