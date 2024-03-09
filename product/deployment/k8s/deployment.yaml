@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product
+  template:
+    metadata:
+      labels:
+        app: product
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: product
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "100m"
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+        image: jorgelvelasquez/product-service:latest
+        ports:
+        - containerPort: 3002
+        env:
+        - name: API_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: API_PREFIX_PRODUCT
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: DB_HOST_PRODUCT
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_USER_PRODUCT
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_PASSWORD_PRODUCT
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: DB_NAME_PRODUCT
+        - name: DB_SYNCHRONIZE
+          value: "true"
+        - name: PORT
+          value: "3002"
+        - name: AUTH_HOST_API_VALID_TOKEN
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: AUTH_HOST_API_VALID_TOKEN
+        command: ["/bin/sh", "-c"]
+        args: ["until nc -zv db-product 5432; do sleep 5; done; exec node /usr/src/app/dist/main"]

@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommendation
+  template:
+    metadata:
+      labels:
+        app: recommendation
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: recommendation
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "100m"
+          limits:
+            memory: "64Mi"
+            cpu: "200m"
+        image: jorgelvelasquez/recommendations-service:latest
+        ports:
+        - containerPort: 3003
+        env:
+        - name: API_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: API_PREFIX_RECOMMENDATION
+        - name: PRODUCT_PORT
+          value: "3002"
+        - name: PRODUCT_HOST_API
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: PRODUCT_HOST_API_RECOMMENDATION
+        - name: CLIENT_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: CLIENT_DB_NAME_RECOMMENDATION
+        - name: CLIENT_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: CLIENT_DB_USER_RECOMMENDATION
+        - name: CLIENT_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: financial-secret
+              key: CLIENT_DB_PASSWORD_RECOMMENDATION
+        - name: CLIENT_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: CLIENT_DB_HOST_RECOMMENDATION
+        - name: CLIENT_DB_PORT
+          value: "5432"
+        - name: CLIENT_DB_SYNCHRONIZE
+          value: "true"
+        - name: CLIENT_PORT
+          value: "3001"
+        - name: PORT
+          value: "3003"
+        - name: AUTH_HOST_API_VALID_TOKEN
+          valueFrom:
+            configMapKeyRef:
+              name: financial-config
+              key: AUTH_HOST_API_VALID_TOKEN
+        command: ["/bin/sh", "-c"]
+        args: ["until nc -zv db-client 5432; do sleep 5; done; exec node /usr/src/app/dist/main"]

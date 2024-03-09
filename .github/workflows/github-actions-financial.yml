@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [20.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -61,3 +61,169 @@ jobs:
       run: |
         cd recommendations
         npm run test
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+    - name: Build and push Docker image auth
+      uses: docker/build-push-action@v2
+      with:
+        context: ./auth
+        file: ./auth/deployment/docker/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/auth-service:latest
+    
+    - name: Build and push Docker image client
+      uses: docker/build-push-action@v2
+      with:
+        context: ./client
+        file: ./client/deployment/docker/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/client-service:latest
+
+    - name: Build and push Docker image product
+      uses: docker/build-push-action@v2
+      with:
+        context: ./product
+        file: ./product/deployment/docker/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/product-service:latest
+
+    - name: Build and push Docker image recommendations
+      uses: docker/build-push-action@v2
+      with:
+        context: ./recommendations
+        file: ./recommendations/deployment/docker/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/recommendations-service:latest
+    
+    - name: Build and push Docker image prometheus
+      uses: docker/build-push-action@v2
+      with:
+        context: ./deployment/metrics
+        file: ./deployment/metrics/Dockerfile.prometheus
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/financial-prometheus:latest
+
+    - name: Build and push Docker image grafana
+      uses: docker/build-push-action@v2
+      with:
+        context: ./deployment/metrics
+        file: ./deployment/metrics/Dockerfile.grafana
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/financial-grafana:latest
+
+  deploy-auth:
+    if: false
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Railway
+      run: npm i -g @railway/cli
+    - name: Deploy auth service to Railway
+      run: |
+        cd auth
+        railway up --service auth
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        API_PREFIX: ${{ secrets.API_PREFIX_AUTH }}
+        DB_HOST: ${{ secrets.DB_HOST_AUTH }}
+        DB_PORT: ${{ secrets.DB_PORT_AUTH }}
+        DB_USER: ${{ secrets.DB_USER_AUTH }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD_AUTH }}
+        DB_NAME: ${{ secrets.DB_NAME_AUTH }}
+        DB_SYNCHRONIZE: ${{ secrets.DB_SYNCHRONIZE_AUTH }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET_AUTH }}
+        JWT_EXPIRATION_TIME: ${{ secrets.JWT_EXPIRATION_TIME_AUTH }}
+        PORT: ${{ secrets.PORT_AUTH }}
+    - name: Get auth service URL
+      id: get-url
+      run: |
+        AUTH_HOST_API_VALID_TOKEN=$(railway open -n):3000/api/v1/auth/valid-token
+        echo $AUTH_HOST_API_VALID_TOKEN
+        echo "::set-output name=AUTH_HOST_API_VALID_TOKEN::$AUTH_HOST_API_VALID_TOKEN"
+  deploy-others:
+    if: false
+    needs: deploy-auth
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Railway
+      run: npm i -g @railway/cli
+    - name: Deploy client service to Railway
+      run: |
+        cd client
+        railway up --service client
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
+        API_PREFIX: ${{secrets.API_PREFIX_CLIENT}}
+        DB_NAME: ${{secrets.DB_NAME_CLIENT}}
+        DB_USER: ${{secrets.DB_USER_CLIENT}}
+        DB_PASSWORD: ${{secrets.DB_PASSWORD_CLIENT}}
+        DB_HOST: ${{secrets.DB_HOST_CLIENT}}
+        DB_PORT: ${{secrets.DB_PORT_CLIENT}}
+        DB_SYNCHRONIZE: ${{secrets.DB_SYNCHRONIZE_CLIENT}}
+        PORT: ${{secrets.PORT_CLIENT}}
+        HOST_API: ${{secrets.HOST_API_CLIENT}}
+    - name: Get client service URL
+      id: get-url-client
+      run: echo "::set-output name=CLIENT_HOST_API::$(railway open -n)"
+    - name: Deploy product service to Railway
+      run: |
+        cd product
+        railway up --service product
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
+        API_PREFIX: ${{secrets.API_PREFIX_PRODUCT}}
+        DB_NAME: ${{secrets.DB_NAME_PRODUCT}}
+        DB_USER: ${{secrets.DB_USER_PRODUCT}}
+        DB_PASSWORD: ${{secrets.DB_PASSWORD_PRODUCT}}
+        DB_HOST: ${{secrets.DB_HOST_PRODUCT}}
+        DB_PORT: ${{secrets.DB_PORT_PRODUCT}}
+        DB_SYNCHRONIZE: ${{secrets.DB_SYNCHRONIZE_PRODUCT}}
+        PORT: ${{secrets.PORT_PRODUCT}}
+        HOST_API: ${{secrets.HOST_API_PRODUCT}}
+    - name: Get product service URL
+      id: get-url-product
+      run: echo "::set-output name=PRODUCT_HOST_API::$(railway open -n)"
+  deploy-recommendations:
+    if: false
+    needs: 
+      - deploy-auth
+      - deploy-others
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Railway
+      run: npm i -g @railway/cli
+    - name: Deploy recommendations service to Railway
+      run: |
+        cd recommendations
+        railway up --service recommendations
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        AUTH_HOST_API_VALID_TOKEN: ${{ secrets.AUTH_HOST_API_VALID_TOKEN }}
+        API_PREFIX: ${{secrets.API_PREFIX_RECOMMENDATION}}
+        PRODUCT_PORT: ${{secrets.PRODUCT_PORT_RECOMMENDATION}}
+        PRODUCT_HOST_API: ${{secrets.PRODUCT_HOST_API}}
+        CLIENT_DB_NAME: ${{secrets.CLIENT_DB_NAME_RECOMMENDATION}}
+        CLIENT_DB_USER: ${{secrets.CLIENT_DB_USER_RECOMMENDATION}}
+        CLIENT_DB_PASSWORD: ${{secrets.CLIENT_DB_PASSWORD_RECOMMENDATION}}
+        CLIENT_DB_HOST: ${{secrets.CLIENT_DB_HOST_RECOMMENDATION}}
+        CLIENT_DB_PORT: ${{secrets.CLIENT_DB_PORT_RECOMMENDATION}}
+        CLIENT_DB_SYNCHRONIZE: ${{secrets.CLIENT_DB_SYNCHRONIZE_RECOMMENDATION}}
+        CLIENT_PORT: ${{secrets.CLIENT_PORT_RECOMMENDATION}}
+        CLIENT_HOST_API: ${{secrets.CLIENT_HOST_API}}
+        PORT: ${{secrets.PORT_RECOMMENDATION}}

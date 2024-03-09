@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'Auth-Service'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['auth:3000']
+  - job_name: 'Client-Service'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['client:3001']
+  - job_name: 'Product-Service'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['product:3002']
+  - job_name: 'Recommendations-Service'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['recommendation:3003']

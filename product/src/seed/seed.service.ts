@@ -9,8 +9,8 @@ import { Repository } from 'typeorm';
 export class SeedService {
   constructor(
     @InjectRepository(Product)
-    private readonly productService: ProductService,
     private readonly productRepository: Repository<Product>,
+    private readonly productService: ProductService,
   ) {}
 
   async runSeed(): Promise<void> {

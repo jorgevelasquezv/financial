@@ -1,0 +1,33 @@
+version: "3"
+services:
+  db-product:
+    image: postgres:14.3
+    restart: always
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    container_name: product_db
+  product-service:
+    depends_on:
+      - db-product
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile
+    restart: always
+    ports:
+      - 3002:3002
+    environment:
+      API_PREFIX: ${API_PREFIX}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+      PORT: ${PORT}
+      HOST_API: ${HOST_API}
+      AUTH_HOST_API_VALID_TOKEN: ${AUTH_HOST_API_VALID_TOKEN}
+    container_name: product_service

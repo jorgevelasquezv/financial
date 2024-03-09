@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ClientModule } from './client/client.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SeedModule } from './seed/seed.module';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { SeedModule } from './seed/seed.module';
     }),
     ClientModule,
     SeedModule,
+    MetricsModule,
   ],
   controllers: [],
   providers: [],

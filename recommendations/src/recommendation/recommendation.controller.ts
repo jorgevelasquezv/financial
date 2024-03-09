@@ -23,6 +23,7 @@ import {
   ApiInternalErrorResponse,
 } from './decorators';
 import { AuthGuard } from './guards/auth.guard';
+import { MetricsService } from '../metrics/metrics.service';
 
 @Controller('recommendation')
 @ApiTags('Recommendation')
@@ -31,7 +32,10 @@ import { AuthGuard } from './guards/auth.guard';
 @ApiProduces('application/json')
 @ApiBearerAuth()
 export class RecommendationController {
-  constructor(private readonly recommendationService: RecommendationService) {}
+  constructor(
+    private readonly recommendationService: RecommendationService,
+    private readonly metricService: MetricsService,
+  ) {}
 
   @Post()
   @UseGuards(AuthGuard)
@@ -41,6 +45,7 @@ export class RecommendationController {
     @Request() req,
   ): Promise<Product[]> {
     const token = req.headers.authorization.split(' ')[1];
+    this.metricService.incrementRequestCounter();
     return this.recommendationService.findProductsInLineWithClientProfile(
       client,
       token,
@@ -55,7 +60,7 @@ export class RecommendationController {
     @Request() req,
   ): Promise<Client[]> {
     const token = req.headers.authorization.split(' ')[1];
-
+    this.metricService.incrementRequestCounter();
     return this.recommendationService.findCustomersWithProductsAdjustedToServiceConditions(
       productCode as ProductCode,
       token,

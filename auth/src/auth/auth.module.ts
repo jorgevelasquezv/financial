@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { User } from './entities/user.entity';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { MetricsModule } from '../metrics/metrics.module';
 
 @Module({
   controllers: [AuthController],
@@ -24,6 +25,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         signOptions: { expiresIn: configServices.get('JWT_EXPIRATION_TIME') },
       }),
     }),
+    MetricsModule,
   ],
   exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule, AuthService],
 })

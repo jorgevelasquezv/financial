@@ -1,0 +1,24 @@
+version: "3"
+services:
+  recommendation-service:
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile
+    restart: always
+    ports:
+      - 3003:3003
+    environment:
+      API_PREFIX: ${API_PREFIX}
+      PRODUCT_PORT: ${PRODUCT_PORT}
+      PRODUCT_HOST_API: ${PRODUCT_HOST_API}
+      CLIENT_DB_NAME: ${CLIENT_DB_NAME}
+      CLIENT_DB_USER: ${CLIENT_DB_USER}
+      CLIENT_DB_PASSWORD: ${CLIENT_DB_PASSWORD}
+      CLIENT_DB_HOST: ${CLIENT_DB_HOST}
+      CLIENT_DB_PORT: ${CLIENT_DB_PORT}
+      CLIENT_DB_SYNCHRONIZE: ${CLIENT_DB_SYNCHRONIZE}
+      CLIENT_PORT: ${CLIENT_PORT}
+      CLIENT_HOST_API: ${CLIENT_HOST_API}
+      PORT: ${PORT}
+      AUTH_HOST_API_VALID_TOKEN: ${AUTH_HOST_API_VALID_TOKEN}
+    container_name: recommendation_service

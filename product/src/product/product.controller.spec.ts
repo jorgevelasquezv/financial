@@ -6,6 +6,7 @@ import { Product } from './entities/product.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { HttpService } from '@nestjs/axios';
 import { Country, ProductCode } from './enums';
+import { MetricsService } from '../metrics/metrics.service';
 
 describe('ProductController', () => {
   let controller: ProductController;
@@ -33,6 +34,12 @@ describe('ProductController', () => {
             get: jest.fn().mockImplementation(() => ({
               pipe: jest.fn(),
             })),
+          },
+        },
+        {
+          provide: MetricsService,
+          useValue: {
+            incrementRequestCounter: jest.fn(),
           },
         },
       ],

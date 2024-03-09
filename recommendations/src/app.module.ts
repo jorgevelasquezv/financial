@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RecommendationModule } from './recommendation/recommendation.module';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { RecommendationModule } from './recommendation/recommendation.module';
       autoLoadEntities: true,
     }),
     RecommendationModule,
+    MetricsModule,
   ],
   controllers: [],
   providers: [],

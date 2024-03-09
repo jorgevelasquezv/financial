@@ -6,6 +6,7 @@ import { Client, Product } from './entities';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { HttpService } from '@nestjs/axios';
 import { Country, ProductCode } from './enums';
+import { MetricsService } from '../metrics/metrics.service';
 
 const mockRepository = jest.fn(() => ({
   findOneBy: jest.fn((entity) => entity),
@@ -33,6 +34,12 @@ describe('RecommendationController', () => {
             get: jest.fn().mockImplementation(() => ({
               pipe: jest.fn(),
             })),
+          },
+        },
+        {
+          provide: MetricsService,
+          useValue: {
+            incrementRequestCounter: jest.fn(),
           },
         },
       ],

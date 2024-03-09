@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: financial-config
+data:
+  # GENERIC ENVIROMENTS
+  AUTH_HOST_API_VALID_TOKEN: http://auth-service:3000/api/v1/auth/valid-token
+  # AUTH-SERVICE
+  API_PREFIX_AUTH: /api/v1
+  DB_HOST_AUTH: db-user # roundhouse.proxy.rlwy.net
+  JWT_SECRET_AUTH: Us3r-s3CR3t
+  JWT_EXPIRATION_TIME_AUTH: 2h
+  # CLIENT-SERVICE
+  API_PREFIX_CLIENT: api/v1
+  DB_NAME_CLIENT: client-db
+  DB_USER_CLIENT: client-db
+  DB_PASSWORD_CLIENT: cl13nt/d4t4/b4s3
+  DB_HOST_CLIENT: db-client
+  # PRODUCT-SERVICE
+  API_PREFIX_PRODUCT: api/v1
+  DB_NAME_PRODUCT: product-db
+  DB_USER_PRODUCT: product-db
+  DB_PASSWORD_PRODUCT: pr0duct/d4t4/b4s3
+  DB_HOST_PRODUCT: db-product
+  # RECOMMENDATION-SERVICE
+  API_PREFIX_RECOMMENDATION: api/v1
+  PRODUCT_HOST_API_RECOMMENDATION: http://product-service:3002/api/v1
+  CLIENT_DB_NAME_RECOMMENDATION: client-db
+  CLIENT_DB_USER_RECOMMENDATION: client-db
+  CLIENT_DB_PASSWORD_RECOMMENDATION: cl13nt/d4t4/b4s3
+  CLIENT_DB_HOST_RECOMMENDATION: db-client

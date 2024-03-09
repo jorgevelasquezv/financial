@@ -1,0 +1,47 @@
+version: "3"
+services:
+  db-user:
+    image: postgres:14.3
+    restart: always
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    container_name: user_db
+  auth-service:
+    depends_on:
+      - db-user
+    build:
+      context: ../..
+      dockerfile: deployment/docker/Dockerfile
+    # image: jorgelvelasquez/auth-service:latest
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      API_PREFIX: ${API_PREFIX}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+      PORT: ${PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_TIME: ${JWT_EXPIRATION_TIME}
+    container_name: auth_service
+  prometheus:
+    build:
+      context: .
+      dockerfile: Dockerfile.prometheus
+    ports:
+      - 9090:9090
+    container_name: prometheus
+  grafana:
+    build:
+      context: .
+      dockerfile: Dockerfile.grafana
+    ports:
+      - 3333:3000
