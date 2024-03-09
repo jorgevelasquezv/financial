@@ -18,15 +18,3 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ['recommendation:3003']
-  - job_name: 'DB-User-Service'
-    scrape_interval: 5s
-    static_configs:
-      - targets: ['db-user:5432']
-  - job_name: 'DB-Client-Service'
-    scrape_interval: 5s
-    static_configs:
-      - targets: ['db-client:5432']
-  - job_name: 'DB-Product-Service'
-    scrape_interval: 5s
-    static_configs:
-      - targets: ['db-product:5432']
