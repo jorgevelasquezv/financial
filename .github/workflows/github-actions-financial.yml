@@ -110,7 +110,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./deployment/metrics
-        file: ./metrics/Dockerfile.prometheus
+        file: ./deployment./metrics/Dockerfile.prometheus
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/financial-prometheus:latest
 
@@ -118,7 +118,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./deployment/metrics
-        file: ./metrics/Dockerfile.grafana
+        file: ./deployment./metrics/Dockerfile.grafana
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/financial-grafana:latest
 
