@@ -117,11 +117,11 @@ spec:
       - name: auth
         resources:
           requests:
-            memory: "32Mi"
-            cpu: "100m"
+            memory: "96Mi"
+            cpu: "300m"
           limits:
-            memory: "64Mi"
-            cpu: "200m"
+            memory: "128Mi"
+            cpu: "400m"
         image: jorgelvelasquez/auth-service:latest
         ports:
         - containerPort: 3000
@@ -168,7 +168,7 @@ spec:
               name: financial-config
               key: JWT_EXPIRATION_TIME_AUTH
         command: ["/bin/sh", "-c"]
-        args: ["until nc -zv db-user 5432; do sleep 5; done; exec node /usr/src/app/dist/main"]
+        args: ["until nc -zv db-user 5432; do sleep 15; done; exec node /usr/src/app/dist/main"]
 ---
 apiVersion: v1
 kind: Service
@@ -259,11 +259,11 @@ spec:
       - name: client
         resources:
           requests:
-            memory: "32Mi"
-            cpu: "100m"
+            memory: "96Mi"
+            cpu: "300m"
           limits:
-            memory: "64Mi"
-            cpu: "200m"
+            memory: "128Mi"
+            cpu: "400m"
         image: jorgelvelasquez/client-service:latest
         ports:
         - containerPort: 3001
@@ -305,7 +305,7 @@ spec:
               name: financial-config
               key: AUTH_HOST_API_VALID_TOKEN
         command: ["/bin/sh", "-c"]
-        args: ["until nc -zv db-client 5432; do sleep 5; done; exec node /usr/src/app/dist/main"]
+        args: ["until nc -zv db-client 5432; do sleep 15; done; exec node /usr/src/app/dist/main"]
 ---
 apiVersion: v1
 kind: Service
@@ -396,11 +396,11 @@ spec:
       - name: product
         resources:
           requests:
-            memory: "32Mi"
-            cpu: "100m"
+            memory: "96Mi"
+            cpu: "300m"
           limits:
-            memory: "64Mi"
-            cpu: "200m"
+            memory: "128Mi"
+            cpu: "400m"
         image: jorgelvelasquez/product-service:latest
         ports:
         - containerPort: 3002
@@ -442,7 +442,7 @@ spec:
               name: financial-config
               key: AUTH_HOST_API_VALID_TOKEN
         command: ["/bin/sh", "-c"]
-        args: ["until nc -zv db-product 5432; do sleep 5; done; exec node /usr/src/app/dist/main"]
+        args: ["until nc -zv db-product 5432; do sleep 15; done; exec node /usr/src/app/dist/main"]
 ---
 apiVersion: v1
 kind: Service
@@ -477,11 +477,11 @@ spec:
       - name: recommendation
         resources:
           requests:
-            memory: "32Mi"
-            cpu: "100m"
+            memory: "96Mi"
+            cpu: "300m"
           limits:
-            memory: "64Mi"
-            cpu: "200m"
+            memory: "128Mi"
+            cpu: "400m"
         image: jorgelvelasquez/recommendations-service:latest
         ports:
         - containerPort: 3003
@@ -532,7 +532,7 @@ spec:
               name: financial-config
               key: AUTH_HOST_API_VALID_TOKEN
         command: ["/bin/sh", "-c"]
-        args: ["until nc -zv db-client 5432; do sleep 5; done; exec node /usr/src/app/dist/main"]
+        args: ["until nc -zv db-client 5432; do sleep 15; done; exec node /usr/src/app/dist/main"]
 ---
 apiVersion: v1
 kind: Service
@@ -567,10 +567,10 @@ spec:
       - name: prometheus
         resources:
           requests:
-            memory: "32Mi"
+            memory: "64Mi"
             cpu: "100m"
           limits:
-            memory: "64Mi"
+            memory: "128Mi"
             cpu: "200m"
         image: jorgelvelasquez/financial-prometheus:latest
         ports:
@@ -608,10 +608,10 @@ spec:
       - name: grafana
         resources:
           requests:
-            memory: "32Mi"
+            memory: "64Mi"
             cpu: "100m"
           limits:
-            memory: "64Mi"
+            memory: "128Mi"
             cpu: "200m"
         image: jorgelvelasquez/financial-grafana:latest
         ports:
@@ -626,6 +626,6 @@ spec:
     app: grafana
   ports:
     - protocol: TCP
-      port: 3333
+      port: 3000
       targetPort: 3000
   type: LoadBalancer
