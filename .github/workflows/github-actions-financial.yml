@@ -109,16 +109,16 @@ jobs:
     - name: Build and push Docker image prometheus
       uses: docker/build-push-action@v2
       with:
-        context: ./deployment
-        file: ./deployment/metrics/Dockerfile.prometheus
+        context: ./deployment/metrics
+        file: ./metrics/Dockerfile.prometheus
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/financial-prometheus:latest
 
     - name: Build and push Docker image grafana
       uses: docker/build-push-action@v2
       with:
-        context: ./deployment
-        file: ./deployment/metrics/Dockerfile.grafana
+        context: ./deployment/metrics
+        file: ./metrics/Dockerfile.grafana
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/financial-grafana:latest
 
