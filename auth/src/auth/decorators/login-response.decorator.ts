@@ -13,7 +13,7 @@ export function ApiLoginResponse() {
     }),
     ApiResponse({
       status: 200,
-      description: 'Internal server error.',
+      description: 'User logged in successfully',
       type: ResponseUserDto,
     }),
     ApiResponse({

@@ -6,6 +6,7 @@ import {
   Param,
   UseGuards,
   Request,
+  HttpCode,
 } from '@nestjs/common';
 import { RecommendationService } from './recommendation.service';
 import { ProductCode } from './enums';
@@ -38,6 +39,7 @@ export class RecommendationController {
   ) {}
 
   @Post()
+  @HttpCode(200)
   @UseGuards(AuthGuard)
   @ApiFindProductsRecommendation()
   findProductsInLineWithClientProfile(

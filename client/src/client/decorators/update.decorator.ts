@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiParam, ApiResponse } from '@nestjs/swagger';
+import { UpdateClientDto } from '../dto/update-client.dto';
 
 export function ApiUpdate() {
   return applyDecorators(
@@ -7,6 +8,11 @@ export function ApiUpdate() {
       name: 'email',
       description: 'The email of the client to update',
       example: 'pperez@mail.com',
+    }),
+    ApiResponse({
+      status: 200,
+      description: 'The client has been successfully updated.',
+      type: UpdateClientDto,
     }),
     ApiResponse({
       status: 400,

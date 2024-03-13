@@ -1,0 +1,10 @@
+{
+    "email": "pmarmol@mail.com",
+    "fullName": "Pablo Marmol",
+    "birthday": "1985-02-24",
+    "revenue": 5000000,
+    "city": "Bogota",
+    "country": "CO",
+    "isActive": true,
+    "accessKey": "Abc123456"
+}

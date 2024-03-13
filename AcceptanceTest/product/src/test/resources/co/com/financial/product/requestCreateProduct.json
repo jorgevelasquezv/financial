@@ -1,0 +1,8 @@
+{
+    "code": "P009",
+    "description": "Cuentas especiales",
+    "countries": ["CO"],
+    "fromAge": 18,
+    "minRevenue": 0,
+    "isActive": true
+}
