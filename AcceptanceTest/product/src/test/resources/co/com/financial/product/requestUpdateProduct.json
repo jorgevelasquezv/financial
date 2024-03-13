@@ -1,0 +1,7 @@
+{
+    "description": "Cuentas especiales update",
+    "countries": ["CO"],
+    "fromAge": 18,
+    "minRevenue": 0,
+    "isActive": true
+}
