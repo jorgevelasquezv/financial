@@ -1,10 +1,10 @@
 {
-    "email": "ppicasso@mail.com",
-    "fullName": "Pablo Picasso",
-    "accessKey": "Abc123456",
+    "email": "pmarmol@mail.com",
+    "fullName": "Pablo Marmol",
     "birthday": "1985-02-24",
-    "country": "CO",
+    "revenue": 5000000,
     "city": "Bogota",
+    "country": "CO",
     "isActive": true,
-    "revenue": 5000000
+    "accessKey": "Abc123456"
 }

@@ -30,7 +30,7 @@ Feature: Acceptance testing scenarios for Auth microservice
     Then status 400
 
     Scenario: Dado que un usuario comercial activo desea actualizar los datos de un cliente Cuando ingresa los datos a actualizar correctamente Entonces el sistema retorna una respuesta exitosa 
-    Given path '/client/ppicasso@mail.com'
+    Given path '/client/pmarmol@mail.com'
     And request requestClientUpdate
     And set headers.Authorization = 'Bearer ' + token
     When method PUT

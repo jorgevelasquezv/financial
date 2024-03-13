@@ -37,7 +37,7 @@ Feature: Acceptance testing scenarios for Product microservice
     And request requestRecommendation
     And set headers.Authorization = 'Bearer ' + token
     When method POST
-    Then status 201
+    Then status 200
 
     Scenario: Dado que un usuario comercial requiere obtener listado de productos que por sus condiciones de servicio se ajustan a un cliente Cuando se realiza la solicitud al sistema de recommendaciones con un cliente que no existe Entonces el sistema restorna una respuesta satisfactoria con el listado de productos asociados
     Given path '/recommendation'

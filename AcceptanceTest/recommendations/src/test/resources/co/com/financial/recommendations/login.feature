@@ -10,4 +10,4 @@ Given path '/login'
 * def requestAuthLogin = {"email": "pperez@financial.com", "password": "Abc123456" }
 And request requestAuthLogin
 When method POST
-Then status 201
+Then status 200

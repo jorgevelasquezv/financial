@@ -75,7 +75,7 @@ export class RecommendationService {
   private async findOneClientByEmail(email: string): Promise<Client> {
     const client = await this.clientRepository.findOneBy({ email });
     if (!client)
-      throw new BadRequestException(`Client with email ${email} not found`);
+      throw new NotFoundException(`Client with email ${email} not found`);
     return client;
   }
 

@@ -9,4 +9,4 @@ Scenario:
 Given path '/login'
 And request requestAuthLogin
 When method POST
-Then status 201
+Then status 200

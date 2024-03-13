@@ -15,7 +15,7 @@ Feature: Acceptance testing scenarios for Auth microservice
     Given path '/login'
     And request requestAuthLogin
     When method POST
-    Then status 201
+    Then status 200
 
     Scenario: Dado que un usuario comercial ingresa credenciales erroneas para autenticación en el sistema financial Cuando desea realizar uso de este Entonces el sistema retorna una exepcion de no autorizado
     Given path '/login'
