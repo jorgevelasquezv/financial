@@ -23,8 +23,12 @@ import {
 } from './decorators';
 import { AuthGuard } from './guards/auth.guard';
 import { MetricsService } from '../metrics/metrics.service';
+import { ApiConsumes, ApiProduces, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Client')
 @ApiInternalErrorResponse()
+@ApiProduces('application/json')
+@ApiConsumes('application/json')
 @Controller('client')
 export class ClientController {
   constructor(

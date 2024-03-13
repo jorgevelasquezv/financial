@@ -1,9 +1,14 @@
 import { HttpCode, applyDecorators } from '@nestjs/common';
-import { ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 
 export function ApiDelete() {
   return applyDecorators(
     HttpCode(204),
+    ApiOperation({
+      summary: 'Delete a client',
+      description:
+        'Delete a client - This operation permits to logic delete a client in Financial System.',
+    }),
     ApiParam({
       name: 'email',
       description: 'The email of the client to update',

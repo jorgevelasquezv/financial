@@ -1,5 +1,10 @@
 import { Controller, Post, Body, Get, HttpCode } from '@nestjs/common';
-import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
+import {
+  ApiConsumes,
+  ApiExcludeEndpoint,
+  ApiProduces,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,6 +23,8 @@ import { ResponseUserDto } from './dto';
 import { MetricsService } from '../metrics/metrics.service';
 
 @ApiTags('Auth')
+@ApiConsumes('application/json')
+@ApiProduces('application/json')
 @ApiInternalErrorResponse()
 @Controller('auth')
 export class AuthController {

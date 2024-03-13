@@ -1,9 +1,14 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { Client } from '../entities/client.entity';
 
 export function ApiFindOne() {
   return applyDecorators(
+    ApiOperation({
+      summary: 'Find a client by email',
+      description:
+        'Find a client by email - This operation permits to retrieve a client in Financial System.',
+    }),
     ApiParam({
       name: 'email',
       description: 'The email of the client to find',
