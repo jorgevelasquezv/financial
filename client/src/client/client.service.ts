@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 
 import { Repository } from 'typeorm';
@@ -49,7 +50,7 @@ export class ClientService {
   async findOne(email: string): Promise<Client> {
     const client = await this.repository.findOneBy({ email });
     if (!client)
-      throw new BadRequestException(`Client with email ${email} not found`);
+      throw new NotFoundException(`Client with email ${email} not found`);
     return client;
   }
 

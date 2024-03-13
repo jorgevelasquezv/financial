@@ -1,6 +1,7 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { ProductCode } from '../enums';
+import { Product } from '../entities/product.entity';
 
 export function ApiUpdate() {
   return applyDecorators(
@@ -13,6 +14,11 @@ export function ApiUpdate() {
       name: 'code',
       description: 'The code of the product to update',
       example: ProductCode.P001,
+    }),
+    ApiResponse({
+      status: 200,
+      description: 'Product updated successfully.',
+      type: Product,
     }),
     ApiResponse({
       status: 400,

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, HttpCode } from '@nestjs/common';
 import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
@@ -35,6 +35,7 @@ export class AuthController {
   }
 
   @Post('/login')
+  @HttpCode(200)
   @ApiLoginResponse()
   login(@Body() loginUserDto: LoginUserDto): Promise<ResponseUserDto> {
     this.metricsServices.incrementRequestCounter();
