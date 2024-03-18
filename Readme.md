@@ -26,6 +26,10 @@ El presente documento describe un análisis y una propuesta de arquitectura para
 
 #### **Propuesta de arquitectura:**
 
+<p align="center">
+  <a href="Arquitectura_Financial.png" target="blank"><img src="Arquitectura_Financial.png" width="200" alt="Arquitectura_Financial" /></a>
+</p>
+
 Se propone una arquitectura basada en microservicios para solucionar los problemas y optimizar el sistema.
 
 #### **Componentes principales:**
