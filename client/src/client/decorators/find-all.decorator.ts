@@ -1,9 +1,14 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Client } from '../entities/client.entity';
 
 export function ApiFindAll() {
   return applyDecorators(
+    ApiOperation({
+      summary: 'Find all clients',
+      description:
+        'Find all clients - This operation permits to retrieve all clients in Financial System.',
+    }),
     ApiResponse({
       status: 200,
       description: 'The records has been successfully retrieved.',

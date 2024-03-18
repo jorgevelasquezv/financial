@@ -26,6 +26,8 @@ async function bootstrap() {
       'The Client API endpoints. Manages customer registration, information and profile. ',
     )
     .setVersion('1.0')
+    .addServer(`${API_PREFIX}`)
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

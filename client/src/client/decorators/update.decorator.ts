@@ -1,9 +1,14 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { UpdateClientDto } from '../dto/update-client.dto';
 
 export function ApiUpdate() {
   return applyDecorators(
+    ApiOperation({
+      summary: 'Update a client',
+      description:
+        'Update a client - This operation permits to update a client in Financial System.',
+    }),
     ApiParam({
       name: 'email',
       description: 'The email of the client to update',

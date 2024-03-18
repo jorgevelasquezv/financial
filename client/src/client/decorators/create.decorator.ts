@@ -1,9 +1,14 @@
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { Client } from '../entities/client.entity';
 import { HttpCode, applyDecorators } from '@nestjs/common';
 
 export function ApiCreate() {
   return applyDecorators(
+    ApiOperation({
+      summary: 'Create a new client',
+      description:
+        'Create a new client - This operation permits to create a new client in Financial System.',
+    }),
     ApiResponse({
       status: 201,
       description: 'The record has been successfully created.',

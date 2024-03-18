@@ -26,6 +26,8 @@ async function bootstrap() {
       'The Product API endpoints. Stores and manages financial product information ',
     )
     .setVersion('1.0')
+    .addServer(`${API_PREFIX}`)
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
